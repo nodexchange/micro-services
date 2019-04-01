@@ -2,12 +2,17 @@ version: "2"
 services:
 #define a service called app
   app:
+    depends_on:
+      - mongo
 #adding a container name
     container_name: cruddockernmain
 #restart the container automatically if it fails
     restart: always
 #building the app image using the Dockerfile in the current directory
     build: .
+#env
+    environment:
+      NODE_ENV: development
 #mapping the host port to the container port.
     ports:
       - "4000:4000"
@@ -15,12 +20,10 @@ services:
       - mongo
 #create another service called mongo
   mongo:
-    container_name: cruddockernmongo
-#pull the official mongodb image from DockerHub registry
-    image: mongo
+    image: mongo:3.3
 #mount the host directory for persistent storage
     volumes:
-      - ./data:/data/db
+      - mongo_data:/data/db
     ports:
       - "27017:27017"
 #creating a service called admin-mongo
@@ -35,3 +38,5 @@ services:
       - DB_HOST=mongo
     links:
       - mongo
+volumes:
+  mongo_data:
