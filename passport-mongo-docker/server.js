@@ -1,21 +1,31 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const express = require('express')
+const mongoose = require('mongoose')
 
-const db = require('./config/keys').mongoURI;
+const db = require('./config/keys').mongoURI
 
-const app = express();
+const app = express()
+
+// initializing routes
+const users = require('./routes/api/users')
 
 // Connect to MongoDB
 mongoose
   .connect(
     db,
-    { useNewUrlparser: true }
+    { useNewUrlParser: true }
   )
   .then(() => console.log('MongoDB Connected'))
-.catch(err => console.log(err));
+.catch(err => console.log('MongoDB error'))// err))
 
-app.get('/', (req, res) => res.send('Hello world!'));
+app.get('/', (req, res) => res.send('Hello world!'))
 
-const port = process.env.PORT || 8082;
+// use Routes
+app.use('/api/users', users)
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+// bodyParser
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+const port = process.env.PORT || 8082
+
+app.listen(port, () => console.log(`Server running on port ${port}`))
