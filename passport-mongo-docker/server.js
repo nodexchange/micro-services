@@ -31,6 +31,8 @@ app.use(passport.initialize())
 require('./config/passport-config')(passport)
 app.get('/path', passport.authenticate('jwt', {session: false}), (req,res) =>  res.send('PROTECTED ROUTE!'))
 
+// initializing routes
+// const users = require('./routes/api/users')
 app.use(cp())
 app.use(bp.urlencoded({extended: false}))
 app.use(bp.json())
