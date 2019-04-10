@@ -1,26 +1,27 @@
 //reads in configuration from a .env file and adds it process.env
-require('dotenv').config() 
-
 const express = require('express')
 const path = require('path')
-const logger = require('morgan');
+const logger = require('morgan')
 const mongoose = require('mongoose')
 const cookieParser = require('cookie-parser')
-const session = require('cookie-session');
+const session = require('cookie-session')
 const bodyParser = require('body-parser')
 
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy
 
-const db = require('./config/keys').mongoURI
 const app = express()
 
+const config = require('./config')
 
+console.log()
+const db = `mongodb://${config.get('db.host')}:${config.get('db.port')}/${config.get('db.name')}`
+console.log(`Suggested mongo ${db}`)
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'jade')
 
-app.use(logger('dev'));
+app.use(logger('dev'))
 // Connect to MongoDB
 mongoose.set('useCreateIndex', true)
 mongoose
@@ -40,33 +41,33 @@ mongoose
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-app.use(session({keys: ['secretkey1', 'secretkey2', '...']}));
+app.use(session({keys: ['secretkey1', 'secretkey2', '...']}))
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(passport.initialize())
+app.use(passport.session())
 
-const Account = require('./models/account');
-passport.use(new LocalStrategy(Account.authenticate()));
+const Account = require('./models/account')
+passport.use(new LocalStrategy(Account.authenticate()))
 
-passport.serializeUser(Account.serializeUser());
-passport.deserializeUser(Account.deserializeUser());
+passport.serializeUser(Account.serializeUser())
+passport.deserializeUser(Account.deserializeUser())
 
 
 // Register routes
-app.use('/', require('./routes'));
+app.use('/', require('./routes'))
 
-const port = process.env.PORT || 8082
+const port = process.env.PORT || config.get('port')
 
 app.listen(port, () => console.log(`Server running on port ${port}`))
 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  const err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+  const err = new Error('Not Found')
+  err.status = 404
+  next(err)
+})
 
 // error handlers
 
@@ -74,23 +75,23 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
+    res.status(err.status || 500)
     res.render('error', {
       message: err.message,
       error: err
-    });
-  });
+    })
+  })
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
+  res.status(err.status || 500)
   res.render('error', {
     message: err.message,
     error: {}
-  });
-});
+  })
+})
 
 
-module.exports = app;
+module.exports = app
